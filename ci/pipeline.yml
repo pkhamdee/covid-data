@@ -1,0 +1,88 @@
+---
+resources:
+  - name: app-src
+    type: git
+    source:
+      uri: git@github.com:pkhamdee/cna-cloud-native-app.git
+      branch: covid
+      private_key: ((github-repo-update-data-deploy-key))
+  - name: data-src
+    type: git
+    source:
+      uri: git@github.com:CSSEGISandData/COVID-19.git
+      branch: master
+      private_key: ((github-repo-deploy-key))
+  - name: app-image
+    type: registry-image
+    source:
+      repository: harbor.dev.pkhamdee.com/cna-covid/cna-covid-data
+      username: _json_key
+      password: ((gcr-service-account-key))
+jobs:
+  - name: update-covid-data
+    public: false
+    plan:
+      - get: data-src
+      - get: app-src
+      - task: clean-data
+        file: app-src/covid/ci/tasks/clean-data/task.yml
+      - task: update-app-src-data
+        file: app-src/covid/ci/tasks/update-data/task.yml
+      - put: app-src
+        params:
+          repository: updated-app-src
+
+  - name: run-server-unit-tests
+    public: false
+    plan:
+      - get: app-src
+        trigger: true
+      - task: test
+        file: app-src/covid/ci/tasks/server-unit-tests/task.yml
+
+#  - name: build-and-push-image
+#    public: false
+#    plan:
+#      - get: app-src
+#        trigger: true
+#        passed:
+#          - run-server-unit-tests
+#      - task: build-and-push-image
+#        file: app-src/covid/ci/tasks/build-and-push-image/task.yml
+#        params:
+#          GCR_SA_KEY: ((gcr-service-account-key))
+#          JIB_BASE_IMAGE: gcr.io/distroless/java
+#          JIB_TARGET_IMAGE: harbor.dev.pkhamdee.com/cna-covid/cna-covid-data
+
+#  - name: deploy-covid-data-gcp
+#    public: false
+#    plan:
+#      - get: app-src
+#      - get: app-image
+#      - task: generate-deployment-definition
+#        file: app-src/covid/ci/tasks/generate-deployment-definition/task-covid-gcp.yml
+#      - task: update-k8s-deployment
+#        file: app-src/covid/ci/tasks/push-deployment-gcp/task.yml
+#        params:
+#          GKE_DEPLOY_KEY: ((gke-deploy-service-account-key))
+#          GKE_DEPLOY_SA_EMAIL: cna-deploy-sa@pa-cna-singapore.iam.gserviceaccount.com
+#          GKE_CLUSTER_NAME: cna-haze-cluster
+#          GKE_CLUSTER_ZONE: asia-southeast1-a
+#          GKE_PROJECT_ID: pa-cna-singapore
+#          DEFINITION_FILE_PATH: deployment-definition/deployment-definition.yaml,app-src/covid/ci/resources/covid-data-ingress.yml
+
+#  - name: deploy-covid-data-aws
+#    public: false
+#    plan:
+#      - get: app-src
+#      - get: app-image
+#      - task: generate-deployment-definition
+#        file: app-src/covid/ci/tasks/generate-deployment-definition/task-covid-aws.yml
+#      - task: update-k8s-deployment
+#        file: app-src/server/ci/tasks/push-deployment-aws/task.yml
+#        params:
+#          AWS_PROVISION_CLUSTER_SA_ACCESS_KEY_ID: ((eks-provision-cluster-service-account-access-key))
+#          AWS_PROVISION_CLUSTER_SA_SECRET_ACCESS_KEY: ((eks-provision-cluster-service-account-secret))
+#          EKS_CLUSTER_NAME: cna-haze-cluster
+#          EKS_CLUSTER_REGION: ap-southeast-1
+#          DEFINITION_FILE_PATH: deployment-definition/deployment-definition.yaml,app-src/covid/ci/resources/covid-data-ingress.yml

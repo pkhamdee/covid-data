@@ -1,0 +1,69 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  namespace: monitoring
+  name: cna-covid-server
+  labels:
+    release: monitoring-release
+spec:
+  selector:
+    matchLabels:
+      app: cna-covid-server
+  namespaceSelector:
+    matchNames:
+      - default
+  endpoints:
+    - port: web
+      path: '/actuator/prometheus'
+      interval: 1s
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: cna-covid-server
+  name: cna-covid-server
+spec:
+  ports:
+    - port: 80
+      name: web
+      protocol: TCP
+      targetPort: 8080
+  selector:
+    app: cna-covid-server
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cna-covid-server
+  labels:
+    app: cna-covid-server
+spec:
+  selector:
+    matchLabels:
+      app: cna-covid-server
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: cna-covid-server
+    spec:
+      imagePullSecrets:
+        - name: gcr-json-key
+      containers:
+        - name: cna-covid-server
+          image: asia.gcr.io/pa-cna-singapore/cna-covid-data@{{DIGEST}}
+          imagePullPolicy: Always
+          readinessProbe:
+            httpGet:
+              port: 8080
+              path: /actuator/prometheus
+            initialDelaySeconds: 5
+          livenessProbe:
+            httpGet:
+              port: 8080
+              path: /actuator/prometheus
+            initialDelaySeconds: 5
+          ports:
+            - containerPort: 8080

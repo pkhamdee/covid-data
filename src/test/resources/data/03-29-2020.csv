@@ -1,0 +1,4 @@
+FIPS,Admin2,Province_State,Country_Region,Last_Update,Lat,Long_,Confirmed,Deaths,Recovered,Active,Combined_Key
+45001,Abbeville,South Carolina,US,2020-03-29 23:08:25,34.22333378,-82.46170658,3,0,0,0,"Abbeville, South Carolina, US"
+22001,Acadia,Louisiana,US,2020-03-29 23:08:25,30.295064899999996,-92.41419698,9,1,0,0,"Acadia, Louisiana, US"
+,,,Singapore,2020-03-29 23:08:13,1.2833,103.8333,844,3,212,629,Singapore
