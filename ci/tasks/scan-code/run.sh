@@ -5,4 +5,4 @@ set -eu -o pipefail
 snyk auth ${snyktoken}
 
 cd app-src 
-snyk test
+snyk monitor --all-projects --org=pkhamdee
