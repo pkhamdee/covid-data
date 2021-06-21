@@ -2,6 +2,7 @@ platform: linux
 
 inputs:
   - name: app-src
+  - name: app-deployment-definition
 
 run:
   path: "app-src/ci/tasks/deploy-covid-data/run.sh"
