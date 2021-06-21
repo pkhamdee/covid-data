@@ -3,13 +3,17 @@
 set -euo pipefail
 
 echo ${kubeconfig} > kube.config
-export KUBECONFIG=./kube.config
 
+echo "-------"
 cat ./kube.config
 
-kubectl cluster-info
+# export KUBECONFIG=./kube.config
 
-cd app-src
-REVISION=$(git rev-parse HEAD)
-echo ${REVISION}
-kp -n images image patch covid-data --git-revision ${REVISION} -w
+
+
+# kubectl cluster-info
+
+# cd app-src
+# REVISION=$(git rev-parse HEAD)
+# echo ${REVISION}
+# kp -n images image patch covid-data --git-revision ${REVISION} -w
