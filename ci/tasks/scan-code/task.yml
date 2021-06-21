@@ -4,7 +4,7 @@ image_resource:
   type: docker-image
   source:
     repository: harbor.dev.pkhamdee.com/library/concourse-helper
-    tag: 2
+    tag: 3
 
 inputs:
   - name: app-src
