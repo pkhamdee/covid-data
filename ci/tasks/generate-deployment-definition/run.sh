@@ -2,7 +2,6 @@
 
 set -eu -o pipefail
 
-set -e
 shopt -s dotglob
 
 export DIGEST=$(cat covid-data-image/digest)
