@@ -2,16 +2,15 @@
 
 set -euo pipefail
 
-echo ${kubeconfig} > kube.config
+echo ${kube-token} 
 
-echo "-------"
+cat ./kubeconfig-template | sed "s/{{{kube-token}}/$kube-token/g" > kube.config
+
 cat ./kube.config
 
-# export KUBECONFIG=./kube.config
+export KUBECONFIG=./kube.config
 
-
-
-# kubectl cluster-info
+kubectl cluster-info
 
 # cd app-src
 # REVISION=$(git rev-parse HEAD)
