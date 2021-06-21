@@ -14,4 +14,4 @@ jobs:
       - get: app-src
         trigger: true
       - task: test
-        file: app-src/ci/tasks/server-unit-tests/task.yml
+        file: app-src/ci/tasks/unit-tests/task.yml
