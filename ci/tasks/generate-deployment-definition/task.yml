@@ -1,0 +1,17 @@
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: starkandwayne/concourse
+
+inputs:
+  - name: app-src
+  - name: app-deployment-definition
+  - name: covid-data-image
+
+outputs:
+  - name: update-deployment
+
+run:
+  path: app-src/covid/ci/tasks/generate-deployment-definition/run.sh

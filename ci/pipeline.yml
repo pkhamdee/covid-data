@@ -4,21 +4,35 @@ resource_types:
     type: registry-image
     source:
       repository: cfcommunity/slack-notification-resource
-
 resources:
   - name: app-src
     type: git
     source:
       uri: git@github.com:pkhamdee/covid-data.git
-      branch: ((git-branch))
+      branch: ((git-covid-data-branch))
       private_key: ((github-repo-update-data-key))
-
+  - name: app-deployment-definition
+    type: git
+    source:
+      uri: git@github.com:pkhamdee/covid-data-cd.git
+      branch: ((git-covid-data-cd-branch))
+      private_key: ((github-repo-update-data-key))
+  - name: covid-data-image
+    type: docker-image
+    source:
+      repository: ((harbordomain))/cna-covid/covid-data
+      tag: latest  
+  - name: concourse-helper
+    type: docker-image
+    source:
+      repository: ((harbordomain))/library/concourse-helper
+      tag: 1
   - name: notify-team
     type: slack-notification
     source:
       url: ((slack_webhook_url))
 jobs:
-  - name: run-unit-tests
+  - name: run-unit-test
     plan:
       - get: app-src
         trigger: true
@@ -30,3 +44,32 @@ jobs:
         text: >
           :x: Unit Test failing on the covid-data repo
           Job: <http://((concourse_host))/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|ID>    
+
+  - name: build-image
+    plan:
+      - get: app-src
+        trigger: true
+        passed:
+        - run-unit-test
+      - get: covid-data-image
+      - get: concourse-helper
+      - task: handoff to TBS
+        image: concourse-helper
+        file: app-src/ci/tasks/build-covid-data-image/task.yml
+        params:
+          kubeconfig: ((kubeconfig))
+
+
+  - name: update-deployment-definition
+    plan:
+      - get: app-src
+      - get: app-deployment-definition
+      - get: covid-data-image
+        trigger: true
+        passed:
+        - build-image
+      - task: update-deployment-definition
+        file: app-src/ci/tasks/generate-deployment-definition/task.yml
+      - put: app-deployment-definition
+        params:
+          repository: update-deployment-definition
