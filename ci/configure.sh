@@ -16,6 +16,6 @@ if [[ "${branch}" != "covid" ]]; then
   exit 1
 fi
 
-fly -t hush-house set-pipeline -p "${pipeline}" \
+fly -t main set-pipeline -p "${pipeline}" \
     -c "$ci_dir_root"/pipeline.yml \
     --load-vars-from <(lpass show -G "cna-demo-app/cna-cloud-native-demo-app-secrets" --notes)
