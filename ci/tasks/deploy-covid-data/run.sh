@@ -9,7 +9,5 @@ export KUBECONFIG=$(pwd)/kubeconfig
 
 kubectl cluster-info
 
-cd app-src
-REVISION=$(git rev-parse HEAD)
-echo ${REVISION}
-kp -n default image patch covid-data --git-revision ${REVISION} -w
+cd app-deployment-definition
+kubectl apply -k overlays/staging
