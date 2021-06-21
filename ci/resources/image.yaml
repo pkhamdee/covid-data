@@ -18,4 +18,4 @@ spec:
       revision: master
       url: git@github.com:pkhamdee/covid-data.git
   successBuildHistoryLimit: 10
-  tag: harbor.dev.pkhamdee.com/cna-covid/covid-data:0.0.1-SNAPSHOT
+  tag: harbor.dev.pkhamdee.com/cna-covid/covid-data:0.1.0
