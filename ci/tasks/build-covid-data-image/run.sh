@@ -12,4 +12,4 @@ kubectl cluster-info
 cd app-src
 REVISION=$(git rev-parse HEAD)
 echo ${REVISION}
-kp -n images image patch covid-data --git-revision ${REVISION} -w
+kp -n default image patch covid-data --git-revision ${REVISION} -w
