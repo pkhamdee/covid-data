@@ -74,4 +74,4 @@ jobs:
           git-email: ((git-email))
       - put: app-deployment-definition
         params:
-          repository: update-deployment-definition
+          repository: update-deployment
