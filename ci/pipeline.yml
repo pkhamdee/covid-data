@@ -11,125 +11,146 @@ resources:
       uri: git@github.com:pkhamdee/covid-data.git
       branch: ((git-covid-data-branch))
       private_key: ((github-repo-update-data-key))
-  - name: app-deployment-definition
-    type: git
-    source:
-      uri: git@github.com:pkhamdee/covid-data-cd.git
-      branch: ((git-covid-data-cd-branch))
-      private_key: ((github-repo-update-data-key))
-  - name: covid-data-image
-    type: docker-image
-    source:
-      repository: ((harbordomain))/cna-covid/covid-data
-      tag: latest  
-  - name: concourse-helper
-    type: docker-image
-    source:
-      repository: ((harbordomain))/library/concourse-helper
-      tag: 1
+  # - name: app-deployment-definition
+  #   type: git
+  #   source:
+  #     uri: git@github.com:pkhamdee/covid-data-cd.git
+  #     branch: ((git-covid-data-cd-branch))
+  #     private_key: ((github-repo-update-data-key))
+  # - name: covid-data-image
+  #   type: docker-image
+  #   source:
+  #     repository: ((harbordomain))/cna-covid/covid-data
+  #     tag: latest  
+  # - name: concourse-helper
+  #   type: docker-image
+  #   source:
+  #     repository: ((harbordomain))/library/concourse-helper
+  #     tag: 1
   - name: notify-team
     type: slack-notification
     source:
       url: ((slack_webhook_url))
 
 jobs:
-  - name: run-unit-test
+  # - name: run-unit-test
+  #   plan:
+  #     - get: app-src
+  #       trigger: true
+  #     - task: test
+  #       file: app-src/ci/tasks/unit-tests/task.yml
+  #   on_failure:
+  #     put: notify-team
+  #     params:
+  #       text: >
+  #         :( Unit Test failing on the covid-data repo
+  #         Job: <((concourse_host))/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|ID>  
+  #   on_success:
+  #     put: notify-team
+  #     params:
+  #       text: >
+  #         :D Unit test success on the covid-data repo
+  #         Job: <((concourse_host))/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|ID>       
+   
+  - name: scan-code
     plan:
       - get: app-src
         trigger: true
-      - task: test
-        file: app-src/ci/tasks/unit-tests/task.yml
+      - task: scan-code
+        file: app-src/ci/tasks/scan-code/task.yml
+        params:
+          snyktoken: ((snyktoken))
     on_failure:
       put: notify-team
       params:
         text: >
-          :( Unit Test failing on the covid-data repo
-          Job: <http://((concourse_host))/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|ID>  
+          :( Scan code failing on the covid-data repo
+          Job: <((concourse_host))/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|ID>  
     on_success:
       put: notify-team
       params:
         text: >
-          :D Unit test success on the covid-data repo
-          Job: <http://((concourse_host))/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|ID>       
-          
-
-  - name: build-image
-    plan:
-      - get: app-src
-        trigger: true
-        passed:
-        - run-unit-test
-      - get: concourse-helper
-      - task: handoff-to-tbs
-        image: concourse-helper
-        file: app-src/ci/tasks/build-covid-data-image/task.yml
-        params:
-          kubetoken: ((kubetoken))
-    on_failure:
-      put: notify-team
-      params:
-        text: >
-          :( Build Image failing on the covid-data repo
-          Job: <http://((concourse_host))/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|ID>   
-    on_success:
-      put: notify-team
-      params:
-        text: >
-          :D Build image success on the covid-data repo
-          Job: <http://((concourse_host))/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|ID>            
+          :D Scan code success on the covid-data repo
+          Job: <((concourse_host))/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|ID>  
 
 
-  - name: update-deployment-definition
-    plan:
-      - get: app-src
-        trigger: true
-        passed:
-        - build-image
-      - get: app-deployment-definition
-      - get: covid-data-image
-      - task: update-deployment-definition
-        file: app-src/ci/tasks/generate-deployment-definition/task.yml
-        params:
-          git-user: ((git-user))
-          git-email: ((git-email))
-      - put: app-deployment-definition
-        params:
-          repository: update-deployment
-    on_failure:
-      put: notify-team
-      params:
-        text: >
-          :( Update deployment definition failing on the covid-data repo
-          Job: <http://((concourse_host))/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|ID>    
-    on_success:
-      put: notify-team
-      params:
-        text: >
-          :D Update deployment definition success on the covid-data repo
-          Job: <http://((concourse_host))/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|ID>             
+  # - name: build-image
+  #   plan:
+  #     - get: app-src
+  #       trigger: true
+  #       passed:
+  #       - run-unit-test
+  #     - get: concourse-helper
+  #     - task: handoff-to-tbs
+  #       image: concourse-helper
+  #       file: app-src/ci/tasks/build-covid-data-image/task.yml
+  #       params:
+  #         kubetoken: ((kubetoken))
+  #   on_failure:
+  #     put: notify-team
+  #     params:
+  #       text: >
+  #         :( Build Image failing on the covid-data repo
+  #         Job: <((concourse_host))/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|ID>   
+  #   on_success:
+  #     put: notify-team
+  #     params:
+  #       text: >
+  #         :D Build image success on the covid-data repo
+  #         Job: <((concourse_host))/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|ID>            
 
-  - name: deploy-covid-data
-    plan:
-      - get: app-deployment-definition
-      - get: app-src
-        trigger: true
-        passed:
-        - update-deployment-definition  
-      - get: concourse-helper
-      - task: deploy-to-k8s
-        image: concourse-helper
-        file: app-src/ci/tasks/deploy-covid-data/task.yml
-        params:
-          kubetoken: ((kubetoken))
-    on_failure:
-      put: notify-team
-      params:
-        text: >
-          :( Deploy covid data failing on the covid-data repo
-          Job: <http://((concourse_host))/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|ID>    
-    on_success:
-      put: notify-team
-      params:
-        text: >
-          :D Deploy covid data success on the covid-data repo
-          Job: <http://((concourse_host))/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|ID>         
+
+  # - name: update-deployment-definition
+  #   plan:
+  #     - get: app-src
+  #       trigger: true
+  #       passed:
+  #       - build-image
+  #     - get: app-deployment-definition
+  #     - get: covid-data-image
+  #     - task: update-deployment-definition
+  #       file: app-src/ci/tasks/generate-deployment-definition/task.yml
+  #       params:
+  #         git-user: ((git-user))
+  #         git-email: ((git-email))
+  #     - put: app-deployment-definition
+  #       params:
+  #         repository: update-deployment
+  #   on_failure:
+  #     put: notify-team
+  #     params:
+  #       text: >
+  #         :( Update deployment definition failing on the covid-data repo
+  #         Job: <((concourse_host))/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|ID>    
+  #   on_success:
+  #     put: notify-team
+  #     params:
+  #       text: >
+  #         :D Update deployment definition success on the covid-data repo
+  #         Job: <((concourse_host))/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|ID>             
+
+  # - name: deploy-covid-data
+  #   plan:
+  #     - get: app-deployment-definition
+  #     - get: app-src
+  #       trigger: true
+  #       passed:
+  #       - update-deployment-definition  
+  #     - get: concourse-helper
+  #     - task: deploy-to-k8s
+  #       image: concourse-helper
+  #       file: app-src/ci/tasks/deploy-covid-data/task.yml
+  #       params:
+  #         kubetoken: ((kubetoken))
+  #   on_failure:
+  #     put: notify-team
+  #     params:
+  #       text: >
+  #         :( Deploy covid data failing on the covid-data repo
+  #         Job: <((concourse_host))/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|ID>    
+  #   on_success:
+  #     put: notify-team
+  #     params:
+  #       text: >
+  #         :D Deploy covid data success on the covid-data repo
+  #         Job: <((concourse_host))/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|ID>         

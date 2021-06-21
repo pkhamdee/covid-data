@@ -13,9 +13,6 @@ cd update-deployment
 
 cp -r ../app-deployment-definition/*  .
 
-echo ${git-email}
-echo ${git-user}
-
 git config --global user.email "${git-email}"
 git config --global user.name "${git-user}"
 git add -A
