@@ -6,7 +6,7 @@ shopt -s dotglob
 
 export DIGEST=$(cat covid-data-image/digest)
 
-sed -i.bak "s/newTag:.*$/newName: harbor.dev.pkhamdee.com/cna-covid/covid-data@${DIGEST}/g" ./app-deployment-definition/overlays/staging/kustomization.yaml
+sed -i.bak "s/newName:.*$/newName: harbor.dev.pkhamdee.com/cna-covid/covid-data@${DIGEST}/g" ./app-deployment-definition/overlays/staging/kustomization.yaml
 rm -f ./app-deployment-definition/overlays/staging/kustomization.yaml.bak
 
 cd update-deployment
