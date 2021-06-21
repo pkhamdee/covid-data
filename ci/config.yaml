@@ -1,5 +1,7 @@
 git-covid-data-branch: staging
 git-covid-data-cd-branch: staging
+git-user: pkhamdee
+git-email: pkhamdee@gmail.com
 harbordomain: harbor.dev.pkhamdee.com
 concourse_host: https://concourse.dev.pkhamdee.com
 slack_webhook_url: https://hooks.slack.com/services/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
