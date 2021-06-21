@@ -20,6 +20,5 @@ echo ${git-user}
 
 git config --global user.email "${git-email}"
 git config --global user.name "${git-user}"
-git fetch
 git add -A
 git commit -m "Update newtag version: ${DIGEST}"
