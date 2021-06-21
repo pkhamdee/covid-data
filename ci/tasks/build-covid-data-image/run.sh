@@ -4,7 +4,7 @@ set -euo pipefail
 
 echo ${kubetoken} 
 
-cat ./app-src/ci/tasks/build-covid-data-image/kubeconfig-template | sed "s/{{{kube-token}}/${kubetoken}/g" > kubeconfig
+cat ./app-src/ci/tasks/build-covid-data-image/kubeconfig-template | sed "s/kubetoken/${kubetoken}/g" > kubeconfig
 
 cat ./kubeconfig
 
