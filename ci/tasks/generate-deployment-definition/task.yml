@@ -14,4 +14,4 @@ outputs:
   - name: update-deployment
 
 run:
-  path: app-src/covid/ci/tasks/generate-deployment-definition/run.sh
+  path: app-src/ci/tasks/generate-deployment-definition/run.sh
