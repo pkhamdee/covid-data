@@ -9,5 +9,6 @@ export KUBECONFIG=$(pwd)/kubeconfig
 
 kubectl cluster-info
 
-cd app-deployment-definition
-kubectl apply -k overlays/staging
+ls -lrt
+
+kubectl apply -k ./app-deployment-definition/overlays/staging
