@@ -34,5 +34,6 @@ out/
 #credential
 ci/pkhamdee.key
 ci/k8s-pongsak-demo-conf
+ci/config.yaml
 
 .DS_Store

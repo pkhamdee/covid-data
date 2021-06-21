@@ -54,14 +54,21 @@ jobs:
    
   - name: scan-code
     plan:
-      - get: app-src
-        trigger: true
-        passed:
-        - run-unit-test
+      - in_parallel:
+        - get: app-src
+          trigger: true
+          passed:
+          - run-unit-test
       - task: scan-code
         file: app-src/ci/tasks/scan-code/task.yml
         params:
           snyktoken: ((snyktoken))
+      - task: code-quality-check
+        file: app-src/ci/tasks/code-quality/task.yml
+        params:
+          sonar-projectKey: ((sonar-projectKey))
+          sonar-host-url: ((sonar-host-url))
+          sonar-login: ((sonar-login))    
     on_failure:
       put: notify-team
       params:
@@ -74,7 +81,6 @@ jobs:
         text: >
           :D Scan code success on the covid-data repo
           Job: <((concourse_host))/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|ID>  
-
 
   - name: build-image
     plan:

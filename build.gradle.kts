@@ -8,6 +8,7 @@ plugins {
 	kotlin("plugin.jpa") version "1.3.61"
 	id("com.google.cloud.tools.jib") version "1.8.0"
 	id("org.jetbrains.kotlin.plugin.noarg") version "1.3.70"
+	id("org.sonarqube") version "3.0"
 }
 
 group = "io.pivotal.cna.demo.covid"
