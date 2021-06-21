@@ -2,6 +2,6 @@
 
 set -eu -o pipefail
 
-pushd app-src/covid
+pushd app-src
   ./gradlew --no-daemon check --stacktrace
 popd

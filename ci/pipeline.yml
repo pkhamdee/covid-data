@@ -8,10 +8,10 @@ resources:
       private_key: ((github-repo-update-data-key))
 
 jobs:
-  - name: run-server-unit-tests
+  - name: run-unit-tests
     public: false
     plan:
       - get: app-src
         trigger: true
       - task: test
-        file: app-src/covid/ci/tasks/server-unit-tests/task.yml
+        file: app-src/ci/tasks/server-unit-tests/task.yml

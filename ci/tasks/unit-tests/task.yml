@@ -10,4 +10,4 @@ inputs:
   - name: app-src
 
 run:
-  path: app-src/covid/ci/tasks/server-unit-tests/run.sh
+  path: app-src/ci/tasks/unit-tests/run.sh
