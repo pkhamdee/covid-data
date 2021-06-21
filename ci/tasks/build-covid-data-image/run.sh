@@ -2,13 +2,13 @@
 
 set -euo pipefail
 
-echo ${kube-token} 
+echo ${kubetoken} 
 
-cat ./kubeconfig-template | sed "s/{{{kube-token}}/$kube-token/g" > kube.config
+cat ./kubeconfig-template | sed "s/{{{kube-token}}/${kubetoken}/g" > kubeconfig
 
-cat ./kube.config
+cat ./kubeconfig
 
-export KUBECONFIG=./kube.config
+export KUBECONFIG=./kubeconfig
 
 kubectl cluster-info
 

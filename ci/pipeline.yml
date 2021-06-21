@@ -56,7 +56,7 @@ jobs:
         image: concourse-helper
         file: app-src/ci/tasks/build-covid-data-image/task.yml
         params:
-          kubeconfig: ((kubeconfig))
+          kubetoken: ((kubetoken))
 
 
   # - name: update-deployment-definition
