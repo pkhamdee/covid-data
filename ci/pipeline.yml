@@ -27,33 +27,32 @@ resources:
     source:
       repository: ((harbordomain))/library/concourse-helper
       tag: 1
-  - name: notify-team
-    type: slack-notification
-    source:
-      url: ((slack_webhook_url))
+  # - name: notify-team
+  #   type: slack-notification
+  #   source:
+  #     url: ((slack_webhook_url))
 jobs:
-  - name: run-unit-test
-    plan:
-      - get: app-src
-        trigger: true
-      - task: test
-        file: app-src/ci/tasks/unit-tests/task.yml
-    on_failure:
-      put: notify-team
-      params:
-        text: >
-          :x: Unit Test failing on the covid-data repo
-          Job: <http://((concourse_host))/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|ID>    
+  # - name: run-unit-test
+  #   plan:
+  #     - get: app-src
+  #       trigger: true
+  #     - task: test
+  #       file: app-src/ci/tasks/unit-tests/task.yml
+  #   on_failure:
+  #     put: notify-team
+  #     params:
+  #       text: >
+  #         :x: Unit Test failing on the covid-data repo
+  #         Job: <http://((concourse_host))/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|ID>    
 
   - name: build-image
     plan:
       - get: app-src
         trigger: true
-        passed:
-        - run-unit-test
-      - get: covid-data-image
+        # passed:
+        # - run-unit-test
       - get: concourse-helper
-      - task: handoff to TBS
+      - task: handoff-to-tbs
         image: concourse-helper
         file: app-src/ci/tasks/build-covid-data-image/task.yml
         params:
@@ -63,11 +62,11 @@ jobs:
   - name: update-deployment-definition
     plan:
       - get: app-src
-      - get: app-deployment-definition
-      - get: covid-data-image
         trigger: true
         passed:
         - build-image
+      - get: app-deployment-definition
+      - get: covid-data-image
       - task: update-deployment-definition
         file: app-src/ci/tasks/generate-deployment-definition/task.yml
       - put: app-deployment-definition

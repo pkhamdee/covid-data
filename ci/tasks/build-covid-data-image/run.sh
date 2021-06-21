@@ -5,6 +5,8 @@ set -euo pipefail
 echo ${kubeconfig} > kube.config
 export KUBECONFIG=./kube.config
 
+cat ./kube.config
+
 kubectl cluster-info
 
 cd app-src
