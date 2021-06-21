@@ -17,16 +17,16 @@ resources:
       uri: git@github.com:pkhamdee/covid-data-cd.git
       branch: ((git-covid-data-cd-branch))
       private_key: ((github-repo-update-data-key))
-  - name: covid-data-image
-    type: docker-image
-    source:
-      repository: ((harbordomain))/cna-covid/covid-data
-      tag: latest  
-  # - name: concourse-helper
+  # - name: covid-data-image
   #   type: docker-image
   #   source:
-  #     repository: ((harbordomain))/library/concourse-helper
-  #     tag: 1
+  #     repository: ((harbordomain))/cna-covid/covid-data
+  #     tag: latest  
+  - name: concourse-helper
+    type: docker-image
+    source:
+      repository: ((harbordomain))/library/concourse-helper
+      tag: 1
   # - name: notify-team
   #   type: slack-notification
   #   source:
@@ -59,19 +59,33 @@ jobs:
   #         kubetoken: ((kubetoken))
 
 
-  - name: update-deployment-definition
+  # - name: update-deployment-definition
+  #   plan:
+  #     - get: app-src
+  #       trigger: true
+  #       # passed:
+  #       # - build-image
+  #     - get: app-deployment-definition
+  #     - get: covid-data-image
+  #     - task: update-deployment-definition
+  #       file: app-src/ci/tasks/generate-deployment-definition/task.yml
+  #       params:
+  #         git-user: ((git-user))
+  #         git-email: ((git-email))
+  #     - put: app-deployment-definition
+  #       params:
+  #         repository: update-deployment
+
+  - name: deploy-covid-data
     plan:
+      - get: app-deployment-definition
       - get: app-src
         trigger: true
         # passed:
-        # - build-image
-      - get: app-deployment-definition
-      - get: covid-data-image
-      - task: update-deployment-definition
-        file: app-src/ci/tasks/generate-deployment-definition/task.yml
+  #       # - build-image  
+      - get: concourse-helper
+      - task: deploy-to-k8s
+        image: concourse-helper
+        file: app-src/ci/tasks/deploy-covid-data/task.yml
         params:
-          git-user: ((git-user))
-          git-email: ((git-email))
-      - put: app-deployment-definition
-        params:
-          repository: update-deployment
+          kubetoken: ((kubetoken))

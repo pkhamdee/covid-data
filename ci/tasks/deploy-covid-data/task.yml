@@ -1,0 +1,7 @@
+platform: linux
+
+inputs:
+  - name: app-src
+
+run:
+  path: "app-src/ci/tasks/build-covid-data-image/run.sh"
