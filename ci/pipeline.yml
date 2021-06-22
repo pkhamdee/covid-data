@@ -63,12 +63,12 @@ jobs:
         file: app-src/ci/tasks/scan-code/task.yml
         params:
           snyktoken: ((snyktoken))
-      - task: code-quality-check
-        file: app-src/ci/tasks/code-quality/task.yml
-        params:
-          sonar-projectKey: ((sonar-projectKey))
-          sonar-host-url: ((sonar-host-url))
-          sonar-login: ((sonar-login))    
+      # - task: code-quality-check
+      #   file: app-src/ci/tasks/code-quality/task.yml
+      #   params:
+      #     sonar-projectKey: ((sonar-projectKey))
+      #     sonar-host-url: ((sonar-host-url))
+      #     sonar-login: ((sonar-login))    
     on_failure:
       put: notify-team
       params:
